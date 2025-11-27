@@ -1,0 +1,25 @@
+version: '3.8'
+
+# Development override for docker-compose.yml
+# Usage: docker-compose -f docker-compose.yml -f docker-compose.dev.yml up
+
+services:
+  postgres:
+    ports:
+      - "5432:5432"
+    environment:
+      - POSTGRES_DB=adqms
+      - POSTGRES_USER=adqms_user
+      - POSTGRES_PASSWORD=adqms_password
+
+  adqms-ml:
+    volumes:
+      - ./adqms-ml/app:/app/app
+    environment:
+      - LOG_LEVEL=DEBUG
+    command: uvicorn app.main:app --host 0.0.0.0 --port 8001 --reload
+
+  adqms-core:
+    environment:
+      - SPRING_PROFILES_ACTIVE=dev
+      - LOGGING_LEVEL_COM_ADQMS=DEBUG
